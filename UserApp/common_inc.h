@@ -10,6 +10,7 @@ extern "C" {
 #include "main.h"
 #include "cmsis_os.h"
 #include "freertos_inc.h"
+#include "usart.h"
 
 void Main(void);
 
@@ -20,7 +21,7 @@ void Main(void);
 #ifdef __cplusplus
 #include "lwip/inet.h"
 #include "lwip/sockets.h"
-#include <cstring>
+#include <string.h>
 #endif
 
 #endif /* USERAPP_COMMON_INC_H */

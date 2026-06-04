@@ -43,3 +43,6 @@ stm32f407igt6\freertos.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_
 stm32f407igt6\freertos.o: ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h
 stm32f407igt6\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os.h
 stm32f407igt6\freertos.o: ../Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS_V2/cmsis_os2.h
+stm32f407igt6\freertos.o: ..\UserApp\common_inc.h
+stm32f407igt6\freertos.o: ..\UserApp\freertos_inc.h
+stm32f407igt6\freertos.o: ../Core/Inc/usart.h

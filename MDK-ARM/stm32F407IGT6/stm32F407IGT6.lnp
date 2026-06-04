@@ -120,7 +120,8 @@
 "stm32f407igt6\nd6.o"
 "stm32f407igt6\sys_arch.o"
 "stm32f407igt6\mqtt.o"
---library_type=microlib --strict --scatter "stm32F407IGT6\stm32F407IGT6.sct"
+"stm32f407igt6\main_1.o"
+--strict --scatter "stm32F407IGT6\stm32F407IGT6.sct"
 --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list "stm32F407IGT6.map" -o stm32F407IGT6\stm32F407IGT6.axf

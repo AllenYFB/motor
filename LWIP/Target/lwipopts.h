@@ -109,9 +109,12 @@
 #define CHECKSUM_CHECK_ICMP6 0
 /*-----------------------------------------------------------------------------*/
 /* USER CODE BEGIN 1 */
-#define MEMP_NUM_NETCONN 8
-#define MEMP_NUM_TCP_PCB 8
+#define MEMP_NUM_NETCONN 12
+#define MEMP_NUM_TCP_PCB 12
 #define MEMP_NUM_TCP_PCB_LISTEN 4
+#define LWIP_SO_RCVTIMEO 1
+#define LWIP_SO_SNDTIMEO 1
+#define LWIP_SO_SNDRCVTIMEO_NONSTANDARD 1
 
 /* USER CODE END 1 */
 
