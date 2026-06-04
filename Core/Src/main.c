@@ -59,6 +59,7 @@
 void SystemClock_Config(void);
 void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
+static void ETH_PHY_Reset(void);
 
 /* USER CODE END PFP */
 
@@ -110,6 +111,7 @@ int main(void)
   MX_UART4_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
+  ETH_PHY_Reset();
 
   /* USER CODE END 2 */
 
@@ -179,6 +181,14 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+static void ETH_PHY_Reset(void)
+{
+  HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_RESET);
+  HAL_Delay(10);
+  HAL_GPIO_WritePin(ETH_RESET_GPIO_Port, ETH_RESET_Pin, GPIO_PIN_SET);
+  HAL_Delay(10);
+}
 
 /* USER CODE END 4 */
 

@@ -27,6 +27,7 @@
 #include "lwip/ethip6.h"
 #include "ethernetif.h"
 /* USER CODE BEGIN Include for User BSP */
+#include "eth_custom_phy_interface.h"
 
 /* USER CODE END Include for User BSP */
 #include <string.h>
@@ -35,7 +36,7 @@
 
 /* Within 'USER CODE' section, code will be kept by default at each generation */
 /* USER CODE BEGIN 0 */
-#include "eth_custom_phy_interface.h"
+
 /* USER CODE END 0 */
 
 /* Private define ------------------------------------------------------------*/
@@ -106,6 +107,15 @@ ETH_DMADescTypeDef  DMARxDscrTab[ETH_RX_DESC_CNT]; /* Ethernet Rx DMA Descriptor
 ETH_DMADescTypeDef  DMATxDscrTab[ETH_TX_DESC_CNT]; /* Ethernet Tx DMA Descriptors */
 
 /* USER CODE BEGIN 2 */
+static user_phy_Object_t UserPhy;
+static uint32_t UserPhyLinkState = USER_PHY_STATUS_LINK_DOWN;
+
+static int32_t ETH_PHY_IO_Init(void);
+static int32_t ETH_PHY_IO_DeInit(void);
+static int32_t ETH_PHY_IO_ReadReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal);
+static int32_t ETH_PHY_IO_WriteReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t RegVal);
+static int32_t ETH_PHY_IO_GetTick(void);
+static void ethernet_link_check_state(struct netif *netif);
 
 /* USER CODE END 2 */
 
@@ -177,6 +187,7 @@ static void low_level_init(struct netif *netif)
   osThreadAttr_t attributes;
 /* USER CODE END OS_THREAD_ATTR_CMSIS_RTOS_V2 */
 /* USER CODE BEGIN low_level_init Variables Initialization for User BSP */
+  user_phy_IOCtx_t ioctx = {0};
 
 /* USER CODE END low_level_init Variables Initialization for User BSP */
   /* Start ETH HAL Init */
@@ -257,6 +268,23 @@ static void low_level_init(struct netif *netif)
   if (hal_eth_init_status == HAL_OK)
   {
 /* USER CODE BEGIN low_level_init Code 2 for User BSP */
+    ioctx.Init = ETH_PHY_IO_Init;
+    ioctx.DeInit = ETH_PHY_IO_DeInit;
+    ioctx.ReadReg = ETH_PHY_IO_ReadReg;
+    ioctx.WriteReg = ETH_PHY_IO_WriteReg;
+    ioctx.GetTick = ETH_PHY_IO_GetTick;
+
+    if (USER_PHY_RegisterBusIO(&UserPhy, &ioctx) != USER_PHY_STATUS_OK)
+    {
+      Error_Handler();
+    }
+
+    if (USER_PHY_Init(&UserPhy) != USER_PHY_STATUS_OK)
+    {
+      Error_Handler();
+    }
+
+    ethernet_link_check_state(netif);
 
 /* USER CODE END low_level_init Code 2 for User BSP */
 
@@ -520,6 +548,100 @@ u32_t sys_now(void)
 /* USER CODE END 6 */
 
 /* USER CODE BEGIN PHI IO Functions for User BSP */
+static int32_t ETH_PHY_IO_Init(void)
+{
+  return 0;
+}
+
+static int32_t ETH_PHY_IO_DeInit(void)
+{
+  return 0;
+}
+
+static int32_t ETH_PHY_IO_ReadReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t *pRegVal)
+{
+  if (HAL_ETH_ReadPHYRegister(&heth, DevAddr, RegAddr, pRegVal) != HAL_OK)
+  {
+    return -1;
+  }
+
+  return 0;
+}
+
+static int32_t ETH_PHY_IO_WriteReg(uint32_t DevAddr, uint32_t RegAddr, uint32_t RegVal)
+{
+  if (HAL_ETH_WritePHYRegister(&heth, DevAddr, RegAddr, RegVal) != HAL_OK)
+  {
+    return -1;
+  }
+
+  return 0;
+}
+
+static int32_t ETH_PHY_IO_GetTick(void)
+{
+  return (int32_t)HAL_GetTick();
+}
+
+static void ethernet_link_check_state(struct netif *netif)
+{
+  ETH_MACConfigTypeDef macconf = {0};
+  int32_t linkstate = USER_PHY_GetLinkState(&UserPhy);
+
+  if (linkstate <= USER_PHY_STATUS_LINK_DOWN)
+  {
+    if (netif_is_link_up(netif))
+    {
+      HAL_ETH_Stop_IT(&heth);
+      netif_set_down(netif);
+      netif_set_link_down(netif);
+    }
+
+    UserPhyLinkState = USER_PHY_STATUS_LINK_DOWN;
+    return;
+  }
+
+  if (linkstate == USER_PHY_STATUS_AUTONEGO_NOTDONE)
+  {
+    return;
+  }
+
+  if (!netif_is_link_up(netif) || (UserPhyLinkState != (uint32_t)linkstate))
+  {
+    if (netif_is_link_up(netif))
+    {
+      HAL_ETH_Stop_IT(&heth);
+    }
+
+    HAL_ETH_GetMACConfig(&heth, &macconf);
+
+    if ((linkstate == USER_PHY_STATUS_100MBITS_FULLDUPLEX) ||
+        (linkstate == USER_PHY_STATUS_100MBITS_HALFDUPLEX))
+    {
+      macconf.Speed = ETH_SPEED_100M;
+    }
+    else
+    {
+      macconf.Speed = ETH_SPEED_10M;
+    }
+
+    if ((linkstate == USER_PHY_STATUS_100MBITS_FULLDUPLEX) ||
+        (linkstate == USER_PHY_STATUS_10MBITS_FULLDUPLEX))
+    {
+      macconf.DuplexMode = ETH_FULLDUPLEX_MODE;
+    }
+    else
+    {
+      macconf.DuplexMode = ETH_HALFDUPLEX_MODE;
+    }
+
+    HAL_ETH_SetMACConfig(&heth, &macconf);
+    HAL_ETH_Start_IT(&heth);
+    netif_set_up(netif);
+    netif_set_link_up(netif);
+    UserPhyLinkState = (uint32_t)linkstate;
+  }
+}
 
 /* USER CODE END PHI IO Functions for User BSP */
 
@@ -531,6 +653,7 @@ void ethernet_link_thread(void* argument)
 {
 
 /* USER CODE BEGIN ETH link init */
+  struct netif *netif = (struct netif *)argument;
 
 /* USER CODE END ETH link init */
 
@@ -538,7 +661,8 @@ void ethernet_link_thread(void* argument)
   {
 
 /* USER CODE BEGIN ETH link Thread core code for User BSP */
-
+    ethernet_link_check_state(netif);
+    
 /* USER CODE END ETH link Thread core code for User BSP */
 
     osDelay(100);

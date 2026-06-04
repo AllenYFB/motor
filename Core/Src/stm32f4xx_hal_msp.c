@@ -81,4 +81,70 @@ void HAL_MspInit(void)
 
 /* USER CODE BEGIN 1 */
 
+void HAL_ETH_MspInit(ETH_HandleTypeDef* heth)
+{
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+  if (heth->Instance == ETH)
+  {
+    /* Enable GPIO clocks */
+    __HAL_RCC_GPIOA_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOG_CLK_ENABLE();
+
+    /* Enable ETH clocks */
+    __HAL_RCC_ETHMAC_CLK_ENABLE();
+    __HAL_RCC_ETHMACTX_CLK_ENABLE();
+    __HAL_RCC_ETHMACRX_CLK_ENABLE();
+
+    /*
+      ETH GPIO Configuration for ATK-DMF407 V1.2 RMII:
+
+      PA1  ------> ETH_REF_CLK
+      PA2  ------> ETH_MDIO
+      PA7  ------> ETH_CRS_DV
+
+      PC1  ------> ETH_MDC
+      PC4  ------> ETH_RXD0
+      PC5  ------> ETH_RXD1
+
+      PG11 ------> ETH_TX_EN
+      PG13 ------> ETH_TXD0
+      PG14 ------> ETH_TXD1
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_7;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+    GPIO_InitStruct.Alternate = GPIO_AF11_ETH;
+    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_1 | GPIO_PIN_4 | GPIO_PIN_5;
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_11 | GPIO_PIN_13 | GPIO_PIN_14;
+    HAL_GPIO_Init(GPIOG, &GPIO_InitStruct);
+
+    /* ETH interrupt */
+    HAL_NVIC_SetPriority(ETH_IRQn, 5, 0);
+    HAL_NVIC_EnableIRQ(ETH_IRQn);
+  }
+}
+
+void HAL_ETH_MspDeInit(ETH_HandleTypeDef* heth)
+{
+  if (heth->Instance == ETH)
+  {
+    __HAL_RCC_ETHMAC_CLK_DISABLE();
+    __HAL_RCC_ETHMACTX_CLK_DISABLE();
+    __HAL_RCC_ETHMACRX_CLK_DISABLE();
+
+    HAL_GPIO_DeInit(GPIOA, GPIO_PIN_1 | GPIO_PIN_2 | GPIO_PIN_7);
+    HAL_GPIO_DeInit(GPIOC, GPIO_PIN_1 | GPIO_PIN_4 | GPIO_PIN_5);
+    HAL_GPIO_DeInit(GPIOG, GPIO_PIN_11 | GPIO_PIN_13 | GPIO_PIN_14);
+
+    HAL_NVIC_DisableIRQ(ETH_IRQn);
+  }
+}
+
 /* USER CODE END 1 */
