@@ -100,3 +100,4 @@ stm32f407igt6\main.o: ../Core/Inc/spi.h
 stm32f407igt6\main.o: ../Core/Inc/tim.h
 stm32f407igt6\main.o: ../Core/Inc/usart.h
 stm32f407igt6\main.o: ../Core/Inc/gpio.h
+stm32f407igt6\main.o: ../Core/Inc/motor_pwm.h

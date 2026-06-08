@@ -31,6 +31,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "motor_pwm.h"
 
 /* USER CODE END Includes */
 
@@ -111,6 +112,10 @@ int main(void)
   MX_UART4_Init();
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
+  if (MotorPwm_Init() != MOTOR_PWM_OK)
+  {
+    Error_Handler();
+  }
   ETH_PHY_Reset();
 
   /* USER CODE END 2 */
@@ -210,6 +215,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
+  if (htim->Instance == TIM1)
+  {
+    MotorPwm_Commutate();
+  }
 
   /* USER CODE END Callback 1 */
 }

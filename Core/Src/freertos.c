@@ -25,6 +25,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "motor_pwm.h"
 
 /* USER CODE END Includes */
 
@@ -57,6 +58,7 @@ const osThreadAttr_t defaultTask_attributes = {
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
+static uint8_t MotorTask_KeyScan(void);
 
 /* USER CODE END FunctionPrototypes */
 
@@ -117,16 +119,91 @@ void StartDefaultTask(void *argument)
   /* init code for LWIP */
   MX_LWIP_Init();
   /* USER CODE BEGIN StartDefaultTask */
+  int32_t duty = 0;
+  uint8_t key;
+
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    key = MotorTask_KeyScan();
+
+    if (key == 1U)
+    {
+      duty += 100;
+      if (duty > (int32_t)(MOTOR_PWM_DUTY_MAX / 2U))
+      {
+        duty = (int32_t)(MOTOR_PWM_DUTY_MAX / 2U);
+      }
+
+      if (duty >= 0)
+      {
+        MotorPwm_SetControl(MOTOR_PWM_DIR_CW, (uint32_t)duty);
+      }
+      else
+      {
+        MotorPwm_SetControl(MOTOR_PWM_DIR_CCW, (uint32_t)(-duty));
+      }
+    }
+    else if (key == 2U)
+    {
+      duty -= 100;
+      if (duty < -(int32_t)(MOTOR_PWM_DUTY_MAX / 2U))
+      {
+        duty = -(int32_t)(MOTOR_PWM_DUTY_MAX / 2U);
+      }
+
+      if (duty >= 0)
+      {
+        MotorPwm_SetControl(MOTOR_PWM_DIR_CW, (uint32_t)duty);
+      }
+      else
+      {
+        MotorPwm_SetControl(MOTOR_PWM_DIR_CCW, (uint32_t)(-duty));
+      }
+    }
+    else if (key == 3U)
+    {
+      duty = 0;
+      MotorPwm_SetControl(MOTOR_PWM_DIR_CCW, 0U);
+    }
+
+    osDelay(10);
   }
   /* USER CODE END StartDefaultTask */
 }
 
 /* Private application code --------------------------------------------------*/
 /* USER CODE BEGIN Application */
+
+static uint8_t MotorTask_KeyScan(void)
+{
+  static GPIO_PinState last_key0 = GPIO_PIN_SET;
+  static GPIO_PinState last_key1 = GPIO_PIN_SET;
+  static GPIO_PinState last_key2 = GPIO_PIN_SET;
+  GPIO_PinState key0 = HAL_GPIO_ReadPin(Key_0_GPIO_Port, Key_0_Pin);
+  GPIO_PinState key1 = HAL_GPIO_ReadPin(Key_1_GPIO_Port, Key_1_Pin);
+  GPIO_PinState key2 = HAL_GPIO_ReadPin(Key_2_GPIO_Port, Key_2_Pin);
+  uint8_t key = 0U;
+
+  if ((last_key0 == GPIO_PIN_SET) && (key0 == GPIO_PIN_RESET))
+  {
+    key = 1U;
+  }
+  else if ((last_key1 == GPIO_PIN_SET) && (key1 == GPIO_PIN_RESET))
+  {
+    key = 2U;
+  }
+  else if ((last_key2 == GPIO_PIN_SET) && (key2 == GPIO_PIN_RESET))
+  {
+    key = 3U;
+  }
+
+  last_key0 = key0;
+  last_key1 = key1;
+  last_key2 = key2;
+
+  return key;
+}
 
 /* USER CODE END Application */
 
