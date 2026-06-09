@@ -1,0 +1,23 @@
+{
+  "terminal.integrated.defaultProfile.windows": "PowerShell No Profile",
+  "terminal.integrated.profiles.windows": {
+    "PowerShell No Profile": {
+      "source": "PowerShell",
+      "args": [
+        "-NoProfile"
+      ],
+      "env": {
+        "PATH": "C:\\Program Files (x86)\\Arm GNU Toolchain arm-none-eabi\\12.2 mpacbti-rel1\\bin;${env:LOCALAPPDATA}\\Microsoft\\WinGet\\Links;${env:PATH}"
+      }
+    }
+  },
+  "terminal.integrated.env.windows": {
+    "PATH": "C:\\Program Files (x86)\\Arm GNU Toolchain arm-none-eabi\\12.2 mpacbti-rel1\\bin;${env:LOCALAPPDATA}\\Microsoft\\WinGet\\Links;${env:PATH}"
+  },
+  "cmake.configureEnvironment": {
+    "PATH": "C:\\Program Files (x86)\\Arm GNU Toolchain arm-none-eabi\\12.2 mpacbti-rel1\\bin;${env:LOCALAPPDATA}\\Microsoft\\WinGet\\Links;${env:PATH}"
+  },
+  "cmake.buildEnvironment": {
+    "PATH": "C:\\Program Files (x86)\\Arm GNU Toolchain arm-none-eabi\\12.2 mpacbti-rel1\\bin;${env:LOCALAPPDATA}\\Microsoft\\WinGet\\Links;${env:PATH}"
+  }
+}

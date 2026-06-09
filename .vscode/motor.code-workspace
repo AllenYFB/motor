@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../SguanFOC库v3.1.0(无感foc，浮点...writing)"
+		},
+		{
+			"path": "../../../机械臂/1.Dummy V2任同学整理/2.Firmware/dummy-42motor-fw"
+		},
+		{
+			"path": "../../../机械臂/1.Dummy V2任同学整理/2.Firmware/dummy-ref-core-fw"
+		}
+	],
+	"settings": {}
+}

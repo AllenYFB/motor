@@ -1,0 +1,22 @@
+build/
+.cache/
+
+# Editor temporary files
+*.log
+*.tmp
+
+# Keil / MDK generated outputs
+MDK-ARM/*/
+*.uvguix.*
+*.uvoptx
+*.lst
+*.crf
+*.d
+*.o
+*.axf
+*.hex
+*.map
+*.lnp
+*.sct
+*.htm
+*.iex
