@@ -2,10 +2,11 @@
 #define SIX_STEP_BLDC_CONTROLLER_HPP
 
 #include "Driver/motor_pwm_driver.hpp"
+#include "Sensor/hall_sensor_base.hpp"
 
 class SixStepBldcController {
  public:
-  explicit SixStepBldcController(MotorPwmDriver &driver);
+  SixStepBldcController(MotorPwmDriver &driver, HallSensorBase &hallSensor);
 
   MotorStatus Init();
   MotorStatus Start();
@@ -33,6 +34,7 @@ class SixStepBldcController {
   void WhVl();
 
   MotorPwmDriver &driver_;
+  HallSensorBase &hallSensor_;
   volatile MotorRunState runState_;
   volatile MotorDirection direction_;
   volatile uint32_t duty_;

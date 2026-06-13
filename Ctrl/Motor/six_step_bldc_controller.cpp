@@ -1,7 +1,8 @@
 #include "Motor/six_step_bldc_controller.hpp"
 
-SixStepBldcController::SixStepBldcController(MotorPwmDriver &driver)
+SixStepBldcController::SixStepBldcController(MotorPwmDriver &driver, HallSensorBase &hallSensor)
     : driver_(driver),
+      hallSensor_(hallSensor),
       runState_(MotorRunState::Stop),
       direction_(MotorDirection::Ccw),
       duty_(0U),
@@ -11,7 +12,7 @@ SixStepBldcController::SixStepBldcController(MotorPwmDriver &driver)
 
 MotorStatus SixStepBldcController::Init()
 {
-  driver_.InitHallGpio();
+  hallSensor_.Init();
   driver_.InitLowSideGpio();
   DisableGate();
   AllBridgeOff();
@@ -136,7 +137,7 @@ void SixStepBldcController::Commutate()
 
 uint32_t SixStepBldcController::GetHallState()
 {
-  return driver_.ReadHallGpio();
+  return hallSensor_.ReadState();
 }
 
 MotorRunState SixStepBldcController::GetRunState() const

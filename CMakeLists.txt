@@ -51,6 +51,7 @@ target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     Ctrl/Motor/motor_instance.cpp
     Ctrl/Motor/six_step_bldc_controller.cpp
     Ctrl/Signal/button_base.cpp
+    Port/stm32_hall_sensor.cpp
     Port/stm32_motor_pwm.cpp
     Port/button_stm32.cpp
     UserApp/main.cpp
