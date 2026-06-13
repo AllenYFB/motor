@@ -376,6 +376,18 @@ build/Debug/stm32F407IGT6.elf
 build/Debug/stm32F407IGT6.map
 ```
 
+如果需要生成 `.bin` 文件：
+
+```powershell
+arm-none-eabi-objcopy -O binary build/Debug/stm32F407IGT6.elf build/Debug/stm32F407IGT6.bin
+```
+
+生成后会得到：
+
+```text
+build/Debug/stm32F407IGT6.bin
+```
+
 也可以在 VS Code 中运行任务：
 
 ```text

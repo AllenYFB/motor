@@ -11,6 +11,9 @@ cmake_minimum_required(VERSION 3.22)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS ON)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS ON)
 
 
 # Define the build type
@@ -25,11 +28,11 @@ set(CMAKE_PROJECT_NAME stm32F407IGT6)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 # Core project settings
-project(${CMAKE_PROJECT_NAME})
+project(${CMAKE_PROJECT_NAME} C CXX ASM)
 message("Build type: " ${CMAKE_BUILD_TYPE})
 
-# Enable CMake support for ASM and C languages
-enable_language(C ASM)
+# Enable CMake support for ASM, C and C++ languages
+enable_language(C CXX ASM)
 
 # Create an executable object type
 add_executable(${CMAKE_PROJECT_NAME})
@@ -45,12 +48,25 @@ target_link_directories(${CMAKE_PROJECT_NAME} PRIVATE
 # Add sources to executable
 target_sources(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user sources here
-    Core/Src/motor_pwm.c
+    Ctrl/Motor/motor_instance.cpp
+    Ctrl/Motor/six_step_bldc_controller.cpp
+    Ctrl/Signal/button_base.cpp
+    Port/stm32_motor_pwm.cpp
+    Port/button_stm32.cpp
+    UserApp/main.cpp
+    UserApp/Tasks/Src/userTaskInit.cpp
+    UserApp/Tasks/Src/userKeyTask.cpp
+    UserApp/Tasks/Src/userMotorTask.cpp
 )
 
 # Add include paths
 target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
     # Add user defined include paths
+    UserApp
+    UserApp/Tasks/Inc
+    Ctrl
+    Ctrl/Motor
+    Port
 )
 
 # Add project symbols (macros)

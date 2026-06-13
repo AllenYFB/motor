@@ -1,52 +1,75 @@
 {
-  "version": "2.0.0",
-  "tasks": [
-    {
-        "label": "Build Debug",
-        "type": "shell",
-        "command": "cmake",
-        "args": [
-            "--build",
-            "--preset",
-            "Debug"
-        ],
-        "options": {
-            "cwd": "${workspaceFolder}",
-            "env": {
-                "PATH": "C:\\Program Files (x86)\\Arm GNU Toolchain arm-none-eabi\\12.2 mpacbti-rel1\\bin;${env:LOCALAPPDATA}\\Microsoft\\WinGet\\Links;${env:PATH}"
-            }
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Debug",
+            "type": "shell",
+            "command": "cmake",
+            "args": [
+                "--build",
+                "--preset",
+                "Debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "PATH": "C:\\Program Files (x86)\\Arm GNU Toolchain arm-none-eabi\\12.2 mpacbti-rel1\\bin;${env:LOCALAPPDATA}\\Microsoft\\WinGet\\Links;${env:PATH}"
+                }
+            },
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "problemMatcher": []
         },
-        "group": {
-            "kind": "test",
-            "isDefault": true
+        {
+            "label": "Flash STM32F407",
+            "type": "shell",
+            "command": "D:\\OpenOCD-20240916-0.12.0\\bin\\openocd.exe",
+            "args": [
+                "-s",
+                "D:\\OpenOCD-20240916-0.12.0\\share\\openocd\\scripts",
+                "-f",
+                "interface/cmsis-dap.cfg",
+                "-c",
+                "transport select swd",
+                "-f",
+                "target/stm32f4x.cfg",
+                "-c",
+                "adapter speed 4000",
+                "-c",
+                "program build/Debug/stm32F407IGT6.elf verify reset exit"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "dependsOn": [
+                "Build Debug"
+            ],
+            "problemMatcher": []
         },
-        "problemMatcher": []
-    },
-    {
-        "label": "Flash STM32F407",
-        "type": "shell",
-        "command": "D:\\OpenOCD-20240916-0.12.0\\bin\\openocd.exe",
-        "args": [
-            "-s",
-            "D:\\OpenOCD-20240916-0.12.0\\share\\openocd\\scripts",
-            "-f",
-            "interface/cmsis-dap.cfg",
-            "-c",
-            "transport select swd",
-            "-f",
-            "target/stm32f4x.cfg",
-            "-c",
-            "adapter speed 4000",
-            "-c",
-            "program build/Debug/stm32F407IGT6.elf verify reset exit"
-        ],
-        "options": {
-            "cwd": "${workspaceFolder}"
-        },
-        "dependsOn": [
-            "Build Debug"
-        ],
-        "problemMatcher": []
-    }
-]
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++.exe 生成活动文件",
+            "command": "C:\\MinGW\\bin\\g++.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "调试器生成的任务。"
+        }
+    ]
 }
