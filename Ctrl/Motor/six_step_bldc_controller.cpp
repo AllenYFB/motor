@@ -13,7 +13,7 @@ SixStepBldcController::SixStepBldcController(MotorPwmDriver &driver, HallSensorB
 MotorStatus SixStepBldcController::Init()
 {
   hallSensor_.Init();
-  driver_.InitLowSideGpio();
+  driver_.InitOutputs();
   DisableGate();
   AllBridgeOff();
   SetControl(MotorDirection::Ccw, 0U);
@@ -46,6 +46,7 @@ void SixStepBldcController::EnableGate()
 
 void SixStepBldcController::DisableGate()
 {
+  driver_.DisableMainOutput();
   driver_.WriteGate(false);
 }
 
@@ -164,41 +165,41 @@ uint32_t SixStepBldcController::ClampCompare(uint32_t compare)
 void SixStepBldcController::AllBridgeOff()
 {
   SetCompare(0U, 0U, 0U);
-  driver_.WriteLowSide(false, false, false);
+  driver_.SetPhaseOutputs(false, false, false, false, false, false);
 }
 
 void SixStepBldcController::UhVl()
 {
-  SetCompare(duty_, 0U, 0U);
-  driver_.WriteLowSide(false, true, false);
+  SetCompare(duty_, GetPeriod(), 0U);
+  driver_.SetPhaseOutputs(true, false, false, false, true, false);
 }
 
 void SixStepBldcController::UhWl()
 {
-  SetCompare(duty_, 0U, 0U);
-  driver_.WriteLowSide(false, false, true);
+  SetCompare(duty_, 0U, GetPeriod());
+  driver_.SetPhaseOutputs(true, false, false, false, false, true);
 }
 
 void SixStepBldcController::VhWl()
 {
-  SetCompare(0U, duty_, 0U);
-  driver_.WriteLowSide(false, false, true);
+  SetCompare(0U, duty_, GetPeriod());
+  driver_.SetPhaseOutputs(false, true, false, false, false, true);
 }
 
 void SixStepBldcController::VhUl()
 {
-  SetCompare(0U, duty_, 0U);
-  driver_.WriteLowSide(true, false, false);
+  SetCompare(GetPeriod(), duty_, 0U);
+  driver_.SetPhaseOutputs(false, true, false, true, false, false);
 }
 
 void SixStepBldcController::WhUl()
 {
-  SetCompare(0U, 0U, duty_);
-  driver_.WriteLowSide(true, false, false);
+  SetCompare(GetPeriod(), 0U, duty_);
+  driver_.SetPhaseOutputs(false, false, true, true, false, false);
 }
 
 void SixStepBldcController::WhVl()
 {
-  SetCompare(0U, 0U, duty_);
-  driver_.WriteLowSide(false, true, false);
+  SetCompare(0U, GetPeriod(), duty_);
+  driver_.SetPhaseOutputs(false, false, true, false, true, false);
 }
