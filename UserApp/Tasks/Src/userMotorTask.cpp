@@ -5,16 +5,20 @@
 
 namespace {
 
-constexpr uint32_t kMotorTaskPeriodMs = 1U;
+constexpr uint32_t kMotorTaskPeriodMs = 10U;
 
 }  // namespace
+
+extern "C" void MotorControlOnPwmTimerTick(void)
+{
+  GetMotorController().Commutate();
+}
 
 extern "C" void UserMotorTask(void *argument)
 {
   (void)argument;
 
   for (;;) {
-    GetMotorController().Commutate();
     osDelay(kMotorTaskPeriodMs);
   }
 }

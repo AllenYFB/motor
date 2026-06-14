@@ -6,6 +6,7 @@ extern "C" {
 #endif
 
 void UserMotorTask(void *argument);
+void MotorControlOnPwmTimerTick(void);
 
 #ifdef __cplusplus
 }
